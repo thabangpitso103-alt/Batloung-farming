@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Batloung Farm – Distribution Management</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg:#f5f2e9;
+    --card:#fffdf7;
+    --text:#263328;
+    --muted:#777a70;
+    --green:#28553b;
+    --green-dark:#193e2b;
+    --green-soft:#edf1e8;
+    --gold:#b89459;
+    --red:#a6443c;
+    --amber:#a87527;
+    --line:#e8e1d3;
+    --shadow:0 16px 40px rgba(43,54,39,.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme:dark;
+      --bg:#151b17;
+      --card:#1e2721;
+      --text:#edf1e9;
+      --muted:#a2afa3;
+      --green:#8bc49a;
+      --green-dark:#172b20;
+      --green-soft:#29382d;
+      --gold:#d6b46f;
+      --red:#f18a7d;
+      --amber:#e5ad61;
+      --line:#354239;
+      --shadow:0 12px 32px rgba(0,0,0,.14);
+    }
+  }
+  * { box-sizing:border-box; }
+  body {
+    min-height:100vh;
+    margin:0;
+    background:
+      radial-gradient(ellipse at 92% 6%,rgba(225,219,192,.38),transparent 30rem),
+      var(--bg);
+    color:var(--text);
+    font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;
+    font-size:15px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  header {
+    position:relative;
+    overflow:hidden;
+    padding:30px 24px 32px;
+    background:
+      radial-gradient(ellipse at 78% 115%,rgba(160,194,126,.24),transparent 32%),
+      linear-gradient(118deg,#142d22 0%,#214832 52%,#315f43 100%);
+    color:#fff;
+    border-bottom:3px solid var(--gold);
+  }
+  .masthead {
+    position:relative;
+    z-index:1;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:28px;
+    width:min(100%,1160px);
+    margin:0 auto;
+  }
+  .brand-lockup { display:flex; align-items:center; gap:18px; min-width:0; }
+  .brand-mark {
+    display:grid;
+    flex:0 0 66px;
+    width:66px;
+    height:66px;
+    place-items:center;
+    border:1px solid rgba(232,207,151,.55);
+    border-radius:22px;
+    background:linear-gradient(145deg,rgba(255,255,255,.15),rgba(255,255,255,.045));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 10px 24px rgba(0,0,0,.12);
+  }
+  .brand-mark svg { width:38px; height:38px; filter:drop-shadow(0 3px 5px rgba(0,0,0,.16)); }
+  .brand-copy { min-width:0; }
+  .brand-eyebrow {
+    display:block;
+    margin-bottom:5px;
+    color:#e4c990;
+    font-size:.68rem;
+    font-weight:750;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+  }
+  header::after {
+    position:absolute;
+    top:-132px;
+    right:12%;
+    width:360px;
+    height:360px;
+    border:1px solid rgba(255,255,255,.11);
+    border-radius:50%;
+    box-shadow:0 0 0 32px rgba(255,255,255,.035),0 0 0 68px rgba(255,255,255,.023),0 0 0 108px rgba(255,255,255,.016);
+    content:"";
+    pointer-events:none;
+  }
+  header h1 {
+    margin:0;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:clamp(1.8rem,3.8vw,2.65rem);
+    font-weight:500;
+    letter-spacing:-.045em;
+    line-height:1.2;
+  }
+  header small {
+    display:block;
+    margin-top:7px;
+    color:rgba(255,255,255,.76);
+    font-size:.88rem;
+    font-weight:450;
+    letter-spacing:.025em;
+  }
+  .masthead-note {
+    flex:0 0 auto;
+    padding:12px 0 12px 22px;
+    border-left:1px solid rgba(255,255,255,.2);
+    text-align:right;
+  }
+  .masthead-note strong {
+    display:block;
+    color:#fff;
+    font-size:.7rem;
+    font-weight:750;
+    letter-spacing:.17em;
+    text-transform:uppercase;
+  }
+  .masthead-note span {
+    display:block;
+    margin-top:5px;
+    color:rgba(255,255,255,.68);
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:.93rem;
+    font-style:italic;
+  }
+  nav {
+    position:sticky;
+    top:0;
+    z-index:4;
+    display:flex;
+    gap:7px;
+    flex-wrap:wrap;
+    padding:12px max(24px,calc((100vw - 1160px)/2));
+    border-bottom:1px solid var(--line);
+    background:color-mix(in srgb,var(--bg) 90%,transparent);
+    backdrop-filter:blur(16px);
+  }
+  nav button {
+    min-height:40px;
+    padding:8px 16px;
+    border:1px solid transparent;
+    border-radius:999px;
+    background:transparent;
+    color:var(--muted);
+    font:inherit;
+    font-size:.9rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease;
+  }
+  nav button:hover { border-color:color-mix(in srgb,var(--gold) 45%,var(--line)); background:var(--card); color:var(--text); }
+  nav button:active { transform:scale(.97); }
+  nav button.active { background:var(--green); color:#fff; box-shadow:0 4px 12px rgba(39,96,68,.2); }
+  nav button.active::after { display:inline-block; width:5px; height:5px; margin-left:8px; border-radius:50%; background:var(--gold); content:""; vertical-align:middle; }
+  main { width:min(100% - 48px,1160px); min-height:420px; margin:30px auto 0; padding-bottom:64px; }
+  .card {
+    margin-bottom:20px;
+    padding:24px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    border-top:2px solid color-mix(in srgb,var(--gold) 56%,var(--line));
+    border-radius:18px;
+    background:var(--card);
+    box-shadow:var(--shadow);
+    animation:card-in .28s ease both;
+  }
+  .card h2 {
+    display:flex;
+    align-items:center;
+    gap:9px;
+    margin:0 0 18px;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:1.32rem;
+    font-weight:600;
+    letter-spacing:-.025em;
+    line-height:1.3;
+  }
+  .card h2::before { width:3px; height:19px; border-radius:3px; background:var(--gold); content:""; }
+  .card h2:empty { display:none; }
+  .scroll { overflow-x:auto; border:1px solid var(--line); border-radius:12px; }
+  table { width:100%; border-collapse:collapse; font-size:.91rem; }
+  th,td { padding:12px 15px; border-bottom:1px solid var(--line); text-align:left; white-space:nowrap; }
+  th {
+    background:var(--green);
+    color:#fffdf7;
+    font-size:.73rem;
+    font-weight:700;
+    letter-spacing:.075em;
+    text-transform:uppercase;
+    border-bottom:2px solid var(--gold);
+  }
+  tbody tr:last-child td,table tr:last-child td { border-bottom:0; }
+  table tr:not(:first-child):hover td { background:color-mix(in srgb,var(--green-soft) 48%,transparent); }
+  .low { color:var(--red); background:color-mix(in srgb,var(--red) 8%,var(--card)); font-weight:700; }
+  .ok { color:var(--green); background:color-mix(in srgb,var(--green) 7%,var(--card)); font-weight:600; }
+  .badge {
+    display:inline-flex;
+    align-items:center;
+    padding:4px 10px;
+    border-radius:999px;
+    color:#fff;
+    font-size:.72rem;
+    font-weight:700;
+    letter-spacing:.045em;
+  }
+  .PAID { background:var(--green); }
+  .PARTIALLY_PAID { background:var(--amber); }
+  .UNPAID { background:var(--red); }
+  label { display:block; margin:12px 0 6px; color:var(--muted); font-size:.82rem; font-weight:650; }
+  input,select {
+    width:100%;
+    min-height:44px;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    outline:none;
+    background:var(--bg);
+    color:var(--text);
+    font:inherit;
+    transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+  }
+  input:hover,select:hover { border-color:color-mix(in srgb,var(--green) 42%,var(--line)); }
+  input:focus,select:focus { border-color:var(--green); background:var(--card); box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 16%,transparent); }
+  input::placeholder { color:var(--muted); opacity:.72; }
+  .row { display:grid; grid-template-columns:minmax(180px,2fr) repeat(3,minmax(100px,1fr)) auto; gap:12px; align-items:end; margin-bottom:12px; padding:16px; border:1px solid var(--line); border-radius:14px; background:color-mix(in srgb,var(--bg) 58%,var(--card)); }
+  .purchase-total { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:18px; padding:17px 20px; border:1px solid color-mix(in srgb,var(--gold) 48%,var(--line)); border-radius:13px; background:linear-gradient(110deg,var(--green-soft),color-mix(in srgb,var(--gold) 10%,var(--card))); }
+  .purchase-total span { color:var(--muted); font-size:.9rem; font-weight:600; }
+  .purchase-total small { display:block; margin-top:4px; color:var(--muted); font-size:.8rem; font-variant-numeric:tabular-nums; }
+  .purchase-total strong { color:var(--green); font-family:Georgia,"Times New Roman",serif; font-size:1.55rem; font-variant-numeric:tabular-nums; }
+  .map-frame { min-height:360px; overflow:hidden; border:1px solid var(--line); border-radius:14px; background:var(--green-soft); }
+  .map-frame iframe { display:block; width:100%; min-height:360px; border:0; }
+  .map-actions { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:12px; }
+  .map-actions .btn { display:inline-flex; align-items:center; justify-content:center; margin:0; text-decoration:none; }
+  .map-note,.field-hint { color:var(--muted); font-size:.82rem; }
+  .btn {
+    min-height:42px;
+    margin-top:14px;
+    padding:10px 18px;
+    border:1px solid var(--green);
+    border-radius:10px;
+    background:var(--green);
+    color:#fff;
+    font:inherit;
+    font-size:.9rem;
+    font-weight:700;
+    cursor:pointer;
+    transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+  }
+  .btn:hover { transform:translateY(-1px); box-shadow:0 6px 15px rgba(39,96,68,.18); }
+  .btn:active { transform:translateY(0); }
+  .btn.sec { border-color:var(--line); background:var(--card); color:var(--text); box-shadow:none; }
+  .btn.sec:hover { border-color:var(--green); color:var(--green); }
+  .row.sale-row { grid-template-columns:minmax(180px,2fr) repeat(4,minmax(100px,1fr)) auto; }
+  .row output {
+    display:flex;
+    align-items:center;
+    min-height:44px;
+    padding:10px 12px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--green-soft);
+    color:var(--green);
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  button:focus-visible { outline:3px solid color-mix(in srgb,var(--green) 42%,transparent); outline-offset:3px; }
+  #msg {
+    position:fixed;
+    bottom:24px;
+    left:50%;
+    z-index:5;
+    max-width:min(90%,560px);
+    padding:13px 20px;
+    transform:translateX(-50%);
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:12px;
+    color:#fff;
+    display:none;
+    box-shadow:0 12px 34px rgba(0,0,0,.2);
+    font-weight:600;
+  }
+  .grid2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); gap:18px; }
+  @keyframes card-in { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+  @media (max-width:640px) {
+    header { padding:24px 18px 26px; }
+    .masthead { gap:16px; }
+    .brand-lockup { gap:13px; }
+    .brand-mark { flex-basis:54px; width:54px; height:54px; border-radius:18px; }
+    .brand-mark svg { width:32px; height:32px; }
+    .brand-eyebrow { font-size:.59rem; letter-spacing:.15em; }
+    header h1 { font-size:clamp(1.55rem,7vw,2rem); }
+    header small { max-width:32ch; font-size:.78rem; line-height:1.4; }
+    .masthead-note { display:none; }
+    header::after { right:-180px; }
+    nav { gap:4px; padding:9px 14px; }
+    nav button { min-height:38px; padding:7px 12px; font-size:.84rem; }
+    main { width:calc(100% - 28px); margin-top:18px; }
+    .card { padding:18px 15px; border-radius:15px; }
+    .card h2 { font-size:1.18rem; }
+    .row { grid-template-columns:1fr 1fr; gap:8px; padding:12px; }
+    .row.sale-row { grid-template-columns:1fr 1fr; }
+    .row > div:first-child { grid-column:1 / -1; }
+    th,td { padding:10px 12px; }
+  }
+  @media (prefers-reduced-motion:reduce) {
+    *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="masthead">
+    <div class="brand-lockup">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 11.6c-4.1-3.1-11.1-.8-11.1 6.3 0 5.2 3.8 12.1 7.8 12.1 1.4 0 2.1-.8 3.3-.8s1.9.8 3.3.8c4 0 7.8-6.9 7.8-12.1 0-7.1-7-9.4-11.1-6.3Z" fill="#E18B59"/>
+          <path d="M20 11.3c-.1-3.1 1.6-5.5 5.5-6.8-.1 3.8-1.9 6.1-5.5 6.8Z" fill="#B8CB83"/>
+          <path d="M20 11.5c-.6-2.2-2-3.8-4.1-4.8" stroke="#E8CF97" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M12.4 19.2c.2-2.5 1.5-4.1 3.4-4.8" stroke="#F5C099" stroke-width="1.4" stroke-linecap="round" opacity=".8"/>
+        </svg>
+      </div>
+      <div class="brand-copy">
+        <span class="brand-eyebrow">Batloung Farm · Maseru, Lesotho</span>
+        <h1>Batloung Farm</h1>
+        <small>Distribution Management System</small>
+      </div>
+    </div>
+    <div class="masthead-note" aria-label="Farm operations">
+      <strong>Farm operations</strong>
+      <span>From orchard to market</span>
+    </div>
+  </div>
+</header>
+<nav id="tabs"></nav>
+<main id="view"></main>
+<div id="msg"></div>
+
+<script>
+const API = '/api';
+const M = n => 'M ' + Number(n || 0).toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+const SIZES = ['SMALL', 'MEDIUM', 'LARGE'];
+let fruits = [], vendors = [], suppliers = [], purchaseUnitCosts = {};
+let locationSearchTimer, locationSearchRequest = 0, locationSuggestions = [];
+let locationMapTimer, locationMapRequest = 0;
+
+async function api(method, url, body) {
+  const r = await fetch(API + url, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+  const j = await r.json().catch(() => ({ error: 'Invalid server response' }));
+  if (!r.ok) throw new Error(j.error + (j.details ? ': ' + j.details.join('; ') : ''));
+  return j;
+}
+function toast(text, ok = true) {
+  const m = document.getElementById('msg'); m.textContent = text; m.style.background = ok ? '#2e7d32' : '#c62828';
+  m.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(() => m.style.display = 'none', 5000);
+}
+const table = (head, rows) => `<div class="scroll"><table><tr>${head.map(h => `<th>${h}</th>`).join('')}</tr>${rows.join('') || `<tr><td colspan="${head.length}">No records</td></tr>`}</table></div>`;
+const options = (list, id, name) => list.map(x => `<option value="${x[id]}">${esc(x[name])}</option>`).join('');
+
+const tabs = {
+  Stock: async v => {
+    const [s, low] = await Promise.all([api('GET', '/stock'), api('GET', '/stock/low')]);
+    const by = {}; s.data.forEach(r => (by[r.fruit_name] ??= {})[r.packaging_size] = r.available_quantity);
+    const th = low.threshold;
+    v.innerHTML = `<div class="card"><h2>Stock by packaging size (boxes)</h2>${table(['Fruit', 'Small', 'Medium', 'Large'],
+      Object.entries(by).map(([f, q]) => `<tr><td>${esc(f)}</td>${SIZES.map(z => `<td class="${q[z] <= th ? 'low' : 'ok'}">${q[z] ?? 0}</td>`).join('')}</tr>`))}
+      <p style="color:var(--muted);font-size:.85rem">Red = low stock (${th} boxes or fewer)</p></div>
+      <div class="card"><h2>⚠ Low stock alerts</h2>${table(['Fruit', 'Size', 'Available'],
+      low.data.map(r => `<tr><td>${esc(r.fruit_name)}</td><td>${r.packaging_size}</td><td class="low">${r.available_quantity}</td></tr>`))}</div>`;
+  },
+  Sell: async v => {
+    [fruits, vendors] = (await Promise.all([api('GET', '/fruits'), api('GET', '/vendors')])).map(r => r.data);
+    v.innerHTML = `<div class="card"><h2>Record a sale</h2>
+      <label>Vendor</label><select id="vendor">${options(vendors, 'vendor_id', 'vendor_name')}</select>
+      <div id="items"></div><button class="btn sec" onclick="addRow('items')">+ Add fruit</button>
+      <div class="purchase-total" aria-live="polite"><div><span>Estimated sale total</span><small id="saleBreakdown">Choose fruit and size to calculate.</small></div><strong id="saleTotal">${M(0)}</strong></div>
+      <div class="grid2"><div><label>Payment method</label><select id="method"><option>CASH</option><option>MOBILE_MONEY</option><option>CREDIT</option></select></div>
+      <div><label>Amount paid now (blank = full for cash/mobile, 0 for credit)</label><input id="paid" type="number" min="0" step="0.01"></div></div>
+      <button class="btn" onclick="submitSale()">Save sale</button></div><div id="out"></div>`;
+    addRow('items');
+  },
+  Purchase: async v => {
+    const [fruitResponse, supplierResponse, costResponse] = await Promise.all([
+      api('GET', '/fruits'), api('GET', '/suppliers'), api('GET', '/purchases/unit-costs'),
+    ]);
+    fruits = fruitResponse.data; suppliers = supplierResponse.data; purchaseUnitCosts = costResponse.data;
+    v.innerHTML = `<div class="card"><h2>Record a purchase from a supplier</h2>
+      <label>Supplier</label><select id="supplier">${suppliers.map(s => `<option value="${s.supplier_id}">${esc(s.business_name)} (${esc(s.province)})</option>`).join('')}</select>
+      <div id="items"></div><button class="btn sec" onclick="addRow('items', true)">+ Add fruit</button>
+      <p class="field-hint">Unit cost fills from your fruit price list when you choose a fruit and size. Change the box count to update the total; you can adjust the cost if your supplier charges a different amount.</p>
+      <div class="purchase-total" aria-live="polite"><div><span>Estimated purchase total</span><small id="purchaseBreakdown">Enter a unit cost to calculate.</small></div><strong id="purchaseTotal">${M(0)}</strong></div>
+      <button class="btn" onclick="submitPurchase()">Save purchase</button></div><div id="out"></div>`;
+    addRow('items', true);
+  },
+  Vendors: async v => {
+    const [vs, out] = await Promise.all([api('GET', '/vendors'), api('GET', '/vendors/outstanding')]);
+    v.innerHTML = `<div class="card"><h2>Outstanding payments</h2>${table(['Vendor', 'Phone', 'Billed', 'Paid', 'Owes'],
+      out.data.map(r => `<tr><td>${esc(r.vendor_name)}</td><td>${esc(r.phone_number)}</td><td>${M(r.total_billed)}</td><td>${M(r.total_paid)}</td><td class="low">${M(r.outstanding_balance)}</td></tr>`))}</div>
+      <div class="card"><h2>Register vendor</h2><div class="grid2"><div><label>Name</label><input id="vn"></div><div><label>Phone</label><input id="vp" placeholder="+26658..."></div><div><label>Location / full address</label><input id="vl"></div><div><label>Latitude (optional)</label><input id="vendorLatitude" type="number" min="-90" max="90" step="any" placeholder="-29.31"></div><div><label>Longitude (optional)</label><input id="vendorLongitude" type="number" min="-180" max="180" step="any" placeholder="27.48"></div></div>
+      <button class="btn" onclick="addVendor()">Register</button></div>
+      <div class="card"><h2>All vendors</h2><label>Search by name or phone</label><input id="vs" oninput="searchVendors(this.value)"><div id="vlist">${vendorTable(vs.data)}</div></div>`;
+  },
+  Locations: async v => {
+    [suppliers, vendors] = (await Promise.all([api('GET', '/suppliers'), api('GET', '/vendors')])).map(r => r.data);
+    v.innerHTML = `<div class="grid2">
+      <div class="card"><h2>Supplier &amp; customer locations</h2>
+        <label>Record type</label><select id="locationType" onchange="refreshLocationPicker()"><option value="supplier">Supplier</option><option value="vendor">Customer / vendor</option></select>
+        <label>Choose a record</label><select id="locationRecord" onchange="loadLocationRecord()"></select>
+        <label>Search for a place in Maseru District</label>
+        <input id="locationAddress" list="locationSuggestions" maxlength="255" autocomplete="off" placeholder="Type a place, street, or landmark" oninput="searchLocationSuggestions(this.value)" onchange="selectLocationSuggestion()">
+        <datalist id="locationSuggestions"></datalist>
+        <p id="locationSuggestionStatus" class="field-hint" aria-live="polite">Type at least 3 characters for place suggestions in Maseru District, Lesotho.</p>
+        <div class="grid2">
+          <div><label>Latitude</label><input id="locationLatitude" type="number" min="-90" max="90" step="any" placeholder="-29.31" oninput="updateLocationMap()"></div>
+          <div><label>Longitude</label><input id="locationLongitude" type="number" min="-180" max="180" step="any" placeholder="27.48" oninput="updateLocationMap()"></div>
+        </div>
+        <p class="field-hint">Choose a suggestion to fill its map pin, or enter exact coordinates manually. Pins outside Maseru District are rejected.</p>
+        <button class="btn" onclick="saveLocation()">Save address &amp; map pin</button>
+      </div>
+      <div class="card"><h2>Satellite view</h2><div id="locationMap"><p class="map-note">Choose a record and add its exact coordinates to see the satellite map.</p></div></div>
+    </div>
+    <p class="map-note">Place suggestions use Photon and OpenStreetMap; searches are sent to Photon. District boundary data: © OpenStreetMap contributors. Satellite imagery and directions are provided by Google Maps, which receives selected coordinates when opened. Pins are limited to Maseru District, Lesotho.</p>`;
+    refreshLocationPicker();
+  },
+  Sales: async v => {
+    const s = await api('GET', '/sales');
+    v.innerHTML = `<div class="card"><h2>Sales &amp; payments</h2>${table(['#', 'Date', 'Vendor', 'Total', 'Paid', 'Balance', 'Status', ''],
+      s.data.map(r => `<tr><td>${r.sale_id}</td><td>${r.sale_date}</td><td>${esc(r.vendor_name)}</td><td>${M(r.total_amount)}</td><td>${M(r.amount_paid)}</td><td>${M(r.outstanding_balance)}</td>
+      <td><span class="badge ${r.payment_status}">${r.payment_status}</span></td>
+      <td>${r.payment_status !== 'PAID' ? `<button class="btn sec" style="margin:0" onclick="pay(${r.sale_id}, ${r.outstanding_balance})">Record payment</button>` : ''}</td></tr>`))}</div>`;
+  },
+  Reports: async v => {
+    const today = new Date().toISOString().slice(0, 10);
+    const [t, tv, sl] = await Promise.all([api('GET', '/reports/top-fruits'), api('GET', '/reports/top-vendor').catch(() => ({ data: null })), api('GET', '/reports/stock-levels')]);
+    v.innerHTML = `<div class="grid2"><div class="card"><h2>Top 5 most sold fruits</h2>${table(['Fruit', 'Boxes sold', 'Sales'], t.data.map(r => `<tr><td>${esc(r.fruit_name)}</td><td>${r.total_boxes_sold}</td><td>${r.number_of_sales}</td></tr>`))}</div>
+      <div class="card"><h2>Vendor with most boxes</h2>${tv.data ? `<p><b>${esc(tv.data.vendor_name)}</b> – ${tv.data.total_boxes} boxes</p>` : '<p>No sales yet</p>'}</div></div>
+      <div class="card"><h2>Revenue for a date range</h2><div class="grid2"><div><label>From</label><input id="from" type="date" value="2026-10-01"></div><div><label>To</label><input id="to" type="date" value="${today}"></div></div>
+      <button class="btn" onclick="revenue()">Calculate</button><div id="rev"></div></div>`;
+  },
+};
+
+function addRow(id, purchase = false) {
+  const d = document.createElement('div'); d.className = purchase ? 'row purchase-row' : 'row sale-row';
+  d.innerHTML = `<div><label>Fruit</label><select class="f">${options(fruits, 'fruit_id', 'fruit_name')}</select></div>
+    <div><label>Size</label><select class="s">${SIZES.map(s => `<option>${s}</option>`).join('')}</select></div>
+    <div><label>Boxes</label><input class="q" type="number" min="1" value="1"></div>
+    ${purchase ? '<div><label>Unit cost per box (M)</label><input class="c" type="number" min="0.01" step="0.01" placeholder="Auto-filled from price list"></div>' :
+      `<div><label>Sell price per box</label><output class="sale-price">${M(0)}</output></div><div><label>Line total</label><output class="sale-line-total">${M(0)}</output></div>`}
+    <button class="btn sec" style="margin:0" onclick="this.parentElement.remove(); ${purchase ? 'updatePurchaseTotal()' : 'updateSaleTotal()'}">✕</button>`;
+  document.getElementById(id).appendChild(d);
+  if (purchase) {
+    d.querySelector('.f').addEventListener('change', () => updatePurchaseUnitCost(d));
+    d.querySelector('.s').addEventListener('change', () => updatePurchaseUnitCost(d));
+    d.querySelectorAll('.q, .c').forEach(input => input.addEventListener('input', updatePurchaseTotal));
+    updatePurchaseUnitCost(d);
+  } else {
+    d.querySelector('.f').addEventListener('change', () => updateSaleRow(d));
+    d.querySelector('.s').addEventListener('change', () => updateSaleRow(d));
+    d.querySelector('.q').addEventListener('input', () => updateSaleRow(d));
+    updateSaleRow(d);
+  }
+}
+function updatePurchaseUnitCost(row) {
+  const fruitName = row.querySelector('.f').selectedOptions[0]?.textContent.trim().toLowerCase();
+  const fruitKey = fruitName?.replace(/mangoes$/, 'mango').replace(/s$/, '');
+  const size = row.querySelector('.s').value;
+  const unitCost = purchaseUnitCosts[fruitKey]?.[size];
+  const costInput = row.querySelector('.c');
+  costInput.value = unitCost ?? '';
+  updatePurchaseTotal();
+}
+function updatePurchaseTotal() {
+  const rows = [...document.querySelectorAll('#items .row')];
+  const lineTotals = [];
+  const total = rows.reduce((sum, row) => {
+    const quantity = Number(row.querySelector('.q').value);
+    const unitCost = Number(row.querySelector('.c')?.value);
+    if (!Number.isFinite(quantity) || quantity <= 0 || !Number.isFinite(unitCost) || unitCost <= 0) return sum;
+    const lineTotal = quantity * unitCost;
+    lineTotals.push(`${quantity} ${quantity === 1 ? 'box' : 'boxes'} × ${M(unitCost)} = ${M(lineTotal)}`);
+    return sum + lineTotal;
+  }, 0);
+  const totalElement = document.getElementById('purchaseTotal');
+  if (totalElement) totalElement.textContent = M(total);
+  const breakdownElement = document.getElementById('purchaseBreakdown');
+  if (breakdownElement) breakdownElement.textContent = lineTotals.join(' + ') || 'Enter a unit cost to calculate.';
+}
+function updateSaleRow(row) {
+  const fruitId = row.querySelector('.f').value;
+  const fruit = fruits.find(item => String(item.fruit_id) === fruitId);
+  const size = row.querySelector('.s').value;
+  const rawPrice = fruit?.[`price_${size.toLowerCase()}`];
+  const unitPrice = rawPrice === null || rawPrice === undefined ? NaN : Number(rawPrice);
+  const quantity = Number(row.querySelector('.q').value);
+  const unitPriceElement = row.querySelector('.sale-price');
+  const lineTotalElement = row.querySelector('.sale-line-total');
+  if (!Number.isFinite(unitPrice) || unitPrice <= 0) {
+    row.dataset.unitPrice = '';
+    row.dataset.lineTotal = '';
+    unitPriceElement.textContent = 'Not set';
+    lineTotalElement.textContent = 'Unavailable';
+  } else {
+    row.dataset.unitPrice = String(unitPrice);
+    unitPriceElement.textContent = M(unitPrice);
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      row.dataset.lineTotal = '';
+      lineTotalElement.textContent = 'Enter boxes';
+    } else {
+      const lineTotal = quantity * unitPrice;
+      row.dataset.lineTotal = String(lineTotal);
+      lineTotalElement.textContent = M(lineTotal);
+    }
+  }
+  updateSaleTotal();
+}
+function updateSaleTotal() {
+  const rows = [...document.querySelectorAll('#items .sale-row')];
+  const totalElement = document.getElementById('saleTotal');
+  const breakdownElement = document.getElementById('saleBreakdown');
+  if (!totalElement || !breakdownElement) return;
+  const missingPrice = rows.some(row => !row.dataset.unitPrice);
+  const missingQuantity = rows.some(row => row.dataset.unitPrice && !row.dataset.lineTotal);
+  const lines = rows.filter(row => row.dataset.lineTotal).map(row => {
+    const fruit = row.querySelector('.f').selectedOptions[0]?.textContent.trim();
+    const size = row.querySelector('.s').value.toLowerCase();
+    const quantity = Number(row.querySelector('.q').value);
+    const unitPrice = Number(row.dataset.unitPrice);
+    return `${fruit} ${size}: ${quantity} × ${M(unitPrice)} = ${M(quantity * unitPrice)}`;
+  });
+  const total = rows.reduce((sum, row) => sum + Number(row.dataset.lineTotal || 0), 0);
+  totalElement.textContent = missingPrice || missingQuantity ? '—' : M(total);
+  breakdownElement.textContent = missingPrice
+    ? 'A selling price is not set for one or more selected fruits.'
+    : missingQuantity
+      ? 'Enter a positive box quantity for each item.'
+      : lines.join(' + ') || 'Choose fruit and size to calculate.';
+}
+function refreshLocationPicker() {
+  const type = document.getElementById('locationType').value;
+  const records = type === 'supplier' ? suppliers : vendors;
+  const idField = type === 'supplier' ? 'supplier_id' : 'vendor_id';
+  const nameField = type === 'supplier' ? 'business_name' : 'vendor_name';
+  const select = document.getElementById('locationRecord');
+  select.innerHTML = records.map(record => `<option value="${record[idField]}">${esc(record[nameField])}</option>`).join('');
+  loadLocationRecord();
+}
+function loadLocationRecord() {
+  clearTimeout(locationSearchTimer);
+  locationSearchRequest++;
+  locationSuggestions = [];
+  document.getElementById('locationSuggestions').innerHTML = '';
+  document.getElementById('locationSuggestionStatus').textContent = 'Type at least 3 characters for place suggestions in Maseru District, Lesotho.';
+  const type = document.getElementById('locationType').value;
+  const records = type === 'supplier' ? suppliers : vendors;
+  const idField = type === 'supplier' ? 'supplier_id' : 'vendor_id';
+  const record = records.find(item => String(item[idField]) === document.getElementById('locationRecord').value);
+  if (!record) return;
+  const addressInput = document.getElementById('locationAddress');
+  addressInput.value = type === 'supplier' ? record.address || '' : record.location || '';
+  addressInput.maxLength = type === 'supplier' ? 255 : 150;
+  document.getElementById('locationSuggestionStatus').textContent = 'Search and select a verified Maseru District place to update this record.';
+  document.getElementById('locationLatitude').value = record.latitude ?? '';
+  document.getElementById('locationLongitude').value = record.longitude ?? '';
+  updateLocationMap();
+}
+function clearLocationPinPreview() {
+  clearTimeout(locationMapTimer);
+  locationMapRequest++;
+  document.getElementById('locationLatitude').value = '';
+  document.getElementById('locationLongitude').value = '';
+  document.getElementById('locationMap').innerHTML = '<p class="map-note">Choose a place suggestion or enter coordinates to preview its Maseru District pin.</p>';
+}
+function searchLocationSuggestions(value) {
+  const query = value.trim();
+  const status = document.getElementById('locationSuggestionStatus');
+  const list = document.getElementById('locationSuggestions');
+  const selected = locationSuggestions.find(place => place.label === query);
+  clearTimeout(locationSearchTimer);
+  const requestId = ++locationSearchRequest;
+  if (selected) {
+    document.getElementById('locationLatitude').value = selected.latitude;
+    document.getElementById('locationLongitude').value = selected.longitude;
+    status.textContent = 'Selected a place inside Maseru District, Lesotho.';
+    updateLocationMap();
+    return;
+  }
+  locationSuggestions = [];
+  list.innerHTML = '';
+  clearLocationPinPreview();
+  if (query.length < 3) {
+    status.textContent = 'Type at least 3 characters for place suggestions in Maseru District, Lesotho.';
+    return;
+  }
+  status.textContent = 'Searching places in Maseru District...';
+  locationSearchTimer = setTimeout(async () => {
+    try {
+      const result = await api('GET', `/locations/suggestions?q=${encodeURIComponent(query)}`);
+      if (requestId !== locationSearchRequest) return;
+      locationSuggestions = result.data;
+      list.innerHTML = locationSuggestions.map(place => `<option value="${esc(place.label)}"></option>`).join('');
+      status.textContent = locationSuggestions.length
+        ? 'Select a suggestion to fill its address and verified map pin.'
+        : 'No matching places found inside Maseru District. Try a nearby street or landmark.';
+    } catch (e) {
+      if (requestId === locationSearchRequest) status.textContent = `Place suggestions unavailable: ${e.message}`;
+    }
+  }, 350);
+}
+function selectLocationSuggestion() {
+  searchLocationSuggestions(document.getElementById('locationAddress').value);
+}
+function updateLocationMap() {
+  const latitudeValue = document.getElementById('locationLatitude').value;
+  const longitudeValue = document.getElementById('locationLongitude').value;
+  const map = document.getElementById('locationMap');
+  if (!map) return;
+  clearTimeout(locationMapTimer);
+  const requestId = ++locationMapRequest;
+  if (latitudeValue === '' && longitudeValue === '') {
+    const maseruCoordinates = '-29.31,27.48';
+    const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent('Maseru, Lesotho')}&z=13&t=k&output=embed`;
+    const mapLink = `https://www.google.com/maps/@${maseruCoordinates},13z/data=!3m1!1e3`;
+    map.innerHTML = `<div class="map-frame"><iframe title="Satellite map centered on Maseru, Lesotho" src="${mapUrl}" loading="lazy" referrerpolicy="no-referrer" allowfullscreen></iframe></div>
+      <div class="map-actions"><a class="btn sec" href="${mapLink}" target="_blank" rel="noopener noreferrer">Explore Maseru</a><span class="map-note">Maseru, Lesotho · Add an exact pin to show a supplier or customer.</span></div>`;
+    return;
+  }
+  if (latitudeValue === '' || longitudeValue === '') {
+    map.innerHTML = '<p class="map-note">Enter valid latitude and longitude to preview this location.</p>';
+    return;
+  }
+  const latitude = Number(latitudeValue);
+  const longitude = Number(longitudeValue);
+  if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 ||
+      !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+    map.innerHTML = '<p class="map-note">Enter valid latitude and longitude to preview this location.</p>';
+    return;
+  }
+  map.innerHTML = '<p class="map-note">Checking that this pin is inside Maseru District...</p>';
+  locationMapTimer = setTimeout(async () => {
+    try {
+      const address = document.getElementById('locationAddress').value.trim();
+      const result = await api('GET', `/locations/validate?address=${encodeURIComponent(address)}&latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}`);
+      if (requestId !== locationMapRequest) return;
+      if (!result.data.withinMaseruDistrict) {
+        map.innerHTML = '<p class="map-note">This pin is outside Maseru District, Lesotho. No map or directions are shown.</p>';
+        return;
+      }
+      if (!result.data.addressMatches) {
+        map.innerHTML = '<p class="map-note">This address could not be verified near the pin in Maseru District. Select a local place suggestion; no directions are shown.</p>';
+        return;
+      }
+      const coordinates = `${latitude},${longitude}`;
+      const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(coordinates)}&z=18&t=k&output=embed`;
+      const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(coordinates)}`;
+      map.innerHTML = `<div class="map-frame"><iframe title="Satellite map with selected location pin in Maseru District" src="${mapUrl}" loading="lazy" referrerpolicy="no-referrer" allowfullscreen></iframe></div>
+        <div class="map-actions"><a class="btn" href="${directionsUrl}" target="_blank" rel="noopener noreferrer">Get directions</a><span class="map-note">${coordinates} · Maseru District, Lesotho</span></div>`;
+    } catch (e) {
+      if (requestId === locationMapRequest) map.innerHTML = `<p class="map-note">Could not verify this pin: ${esc(e.message)}</p>`;
+    }
+  }, 250);
+}
+async function saveLocation() {
+  const type = document.getElementById('locationType').value;
+  const id = document.getElementById('locationRecord').value;
+  const address = document.getElementById('locationAddress').value.trim();
+  const latitudeText = document.getElementById('locationLatitude').value;
+  const longitudeText = document.getElementById('locationLongitude').value;
+  if (!id) { toast('Select a supplier or customer first.', false); return; }
+  if (!address) { toast('Enter the exact street address or place.', false); return; }
+  if (latitudeText === '' || longitudeText === '') { toast('Enter both latitude and longitude.', false); return; }
+  const latitude = Number(latitudeText);
+  const longitude = Number(longitudeText);
+  if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 ||
+      !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+    toast('Enter valid coordinates (latitude -90 to 90, longitude -180 to 180).', false);
+    return;
+  }
+  try {
+    const url = type === 'supplier' ? `/suppliers/${id}` : `/vendors/${id}`;
+    const locationField = type === 'supplier' ? 'address' : 'location';
+    await api('PUT', url, { [locationField]: address, latitude, longitude });
+    toast('Address and map pin saved.');
+    await show('Locations');
+  } catch (e) { toast(e.message, false); }
+}
+const readRows = purchase => [...document.querySelectorAll('#items .row')].map(r => ({
+  fruit_id: +r.querySelector('.f').value, packaging_size: r.querySelector('.s').value, quantity: +r.querySelector('.q').value,
+  ...(purchase ? { unit_cost: +r.querySelector('.c').value } : {}) }));
+
+async function submitSale() {
+  try {
+    const body = { vendor_id: +vendor.value, payment_method: method.value, items: readRows(false) };
+    if (paid.value !== '') body.amount_paid = +paid.value;
+    const r = (await api('POST', '/sales', body)).data;
+    toast('Sale saved – total ' + M(r.total_amount));
+    out.innerHTML = `<div class="card"><h2>Sale #${r.sale_id} – <span class="badge ${r.payment_status}">${r.payment_status}</span></h2>${table(['Fruit', 'Size', 'Boxes', 'Price', 'Line total'],
+      r.items.map(i => `<tr><td>${esc(i.fruit_name)}</td><td>${i.packaging_size}</td><td>${i.quantity}</td><td>${M(i.unit_price)}</td><td>${M(i.line_total)}</td></tr>`))}
+      <p><b>Total ${M(r.total_amount)}</b> · Paid ${M(r.amount_paid)} · Balance ${M(r.outstanding_balance)}</p></div>`;
+  } catch (e) { toast(e.message, false); }
+}
+async function submitPurchase() {
+  try {
+    const r = (await api('POST', '/purchases', { supplier_id: +supplier.value, items: readRows(true) })).data;
+    toast('Purchase saved – total ' + M(r.total_amount) + ', stock updated');
+    out.innerHTML = `<div class="card"><h2>Purchase #${r.purchase_id}: ${M(r.total_amount)}</h2></div>`;
+  } catch (e) { toast(e.message, false); }
+}
+const vendorTable = list => table(['Name', 'Phone', 'Location', 'Registered'], list.map(r => `<tr><td>${esc(r.vendor_name)}</td><td>${esc(r.phone_number)}</td><td>${esc(r.location)}</td><td>${r.registration_date}</td></tr>`));
+async function searchVendors(q) { try { vlist.innerHTML = vendorTable((await api('GET', '/vendors/search?q=' + encodeURIComponent(q || ' '))).data); } catch (e) { if (!q) show('Vendors'); } }
+async function addVendor() {
+  try {
+    const body = { vendor_name: vn.value, phone_number: vp.value, location: vl.value };
+    if (vendorLatitude.value !== '' || vendorLongitude.value !== '') {
+      body.latitude = vendorLatitude.value === '' ? null : Number(vendorLatitude.value);
+      body.longitude = vendorLongitude.value === '' ? null : Number(vendorLongitude.value);
+    }
+    await api('POST', '/vendors', body); toast('Vendor registered'); show('Vendors');
+  }
+  catch (e) { toast(e.message, false); }
+}
+async function pay(id, balance) {
+  const amount = prompt(`Payment amount (balance ${M(balance)}):`, balance); if (!amount) return;
+  const method = prompt('Payment method: CASH or MOBILE_MONEY', 'CASH'); if (!method) return;
+  try { await api('POST', `/sales/${id}/payments`, { amount: +amount, payment_method: method.toUpperCase() }); toast('Payment recorded'); show('Sales'); }
+  catch (e) { toast(e.message, false); }
+}
+async function revenue() {
+  try { const r = (await api('GET', `/reports/revenue?from=${from.value}&to=${to.value}`)).data;
+    rev.innerHTML = `<p><b>${M(r.total_revenue)}</b> from ${r.number_of_sales} sale(s); collected ${M(r.total_collected)}</p>`; }
+  catch (e) { toast(e.message, false); }
+}
+async function show(name) {
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b.textContent === name));
+  const v = document.getElementById('view'); v.innerHTML = '<p>Loading…</p>';
+  try { await tabs[name](v); } catch (e) { v.innerHTML = `<div class="card"><h2>Problem</h2><p class="low">${esc(e.message)}</p></div>`; }
+}
+document.getElementById('tabs').innerHTML = Object.keys(tabs).map(t => `<button onclick="show('${t}')">${t}</button>`).join('');
+show('Stock');
+</script>
+</body>
+</html>
